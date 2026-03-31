@@ -20,21 +20,21 @@ URLS =[
 
 COLLECTION_NAME = "institution_rag"
 
+
 app = FastAPI()
 
 redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
-
+print("FastAPI Loaded")
 print("Loading embedding model...")
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
-
-
-
-
 print("Loading reranker...")
 reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+print("Reranker Loaded Successfully")
 
 print("Loading LLM...")
 llm = ChatOllama(model="llama3")
+
+print("Loaded the Chatollama")
 
 print("All models loaded!")
 
