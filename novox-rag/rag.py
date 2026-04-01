@@ -118,8 +118,8 @@ def ingest():
 
         return {"message": f"Ingested {len(chunks)} chunks"}
 
-    except Exception as e:
-        return {"error": str(e)}
+    except Exception as event:
+        return {"error": str(event)}
 
 @app.get("/query")
 def query_rag(q: str):
@@ -213,6 +213,5 @@ Detailed Answer:
         return {"response": final_answer}
     
 
-    except Exception as e:
-        return {"error": str(e)}
-
+    except Exception as event:
+        return {"error": str(event)}
