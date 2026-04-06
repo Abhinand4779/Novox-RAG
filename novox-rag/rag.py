@@ -120,6 +120,17 @@ def ingest():
     except Exception as event:
         return {"error": str(event)}
 
+@app.put("/access")
+def access():
+    try:
+        docs=load_docs()
+        chunk_related=split_docs
+        store_chunks(DeprecationWarning)
+        return{"message":str}
+    
+    except except as 
+
+
 @app.get("/query")
 def query_rag(q: str):
     try:
@@ -205,3 +216,6 @@ Detailed Answer:
 
     except Exception as event:
         return {"error": str(event)}
+
+
+
