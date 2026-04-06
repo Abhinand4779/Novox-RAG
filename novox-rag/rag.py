@@ -104,7 +104,6 @@ def store_chunks(chunks):
     print(f"Stored {len(points)} vectors")
 
 
-
 @app.get("/")
 def home():
     return {"message": "Industry RAG running 🚀"}
@@ -126,15 +125,12 @@ def query_rag(q: str):
     try:
         print(f"Query: {q}")
 
-        # ✅ Check cache
         cached = redis_client.get(q)
         if cached:
             return {"response": cached}
 
-        # ✅ Encode query
         query_vector = embedder.encode(q).tolist()
 
-        # ✅ Retrieve more results (better recall)
         results = qdrant.query_points(
             collection_name=COLLECTION_NAME,
             query=query_vector,
@@ -146,27 +142,24 @@ def query_rag(q: str):
         if not results:
             return {"response": "No relevant data found."}
 
-        # ✅ Reranking (important)
+        
         pairs = [(q, r.payload.get("text", "")) for r in results]
         scores = reranker.predict(pairs)
 
         ranked = sorted(zip(results, scores), key=lambda x: x[1], reverse=True)
 
-        # ✅ Relevance check
         if ranked[0][1] < 0.3:
             return {"response": "No relevant answer found."}
 
 
         top_results = [r for r, _ in ranked[:3]]
 
-        # ✅ Build context
         context = "\n\n".join([
             r.payload.get("text", "") for r in top_results
         ])
 
 
 
-        # 🔥 STRONG PROMPT (ChatGPT-like answers)
         prompt = f"""
 You are an expert AI assistant.
 
@@ -191,23 +184,20 @@ Question:
 Detailed Answer:
 """
 
-        # ✅ LLM call (longer output)
+
         response = llm.invoke(prompt)
         answer = response.content.strip()
 
-        # ✅ Fallback if bad output
+
         if not answer or len(answer) < 20:
             return {"response": "No detailed answer found."}
 
-        # ✅ Sources
         sources = list(set([
             r.payload.get("source", "") for r in top_results
         ]))
 
-        # ✅ Clean output format
         final_answer = f"{answer}\n\nSources:\n" + "\n".join(sources)
 
-        # ✅ Cache result
         redis_client.set(q, final_answer)
 
         return {"response": final_answer}
